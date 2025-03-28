@@ -3,6 +3,7 @@ os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame, sys, copy, math, gui, json
 
 nodeTypes = {"AND":{'connections':[(-1,0.5,True), (-1,-0.5,True), (1,0,False)]},
+             "NAND":{'connections':[(-1,0.5,True), (-1,-0.5,True), (1,0,False)]},
              "OR":{'connections':[(-1,0.5,True), (-1,-0.5,True), (1,0,False)]},
              "NOT":{'connections':[(-1,0,True), (1,0,False)]},
              "XOR":{'connections':[(-1,0.5,True), (-1,-0.5,True), (1,0,False)]},
@@ -152,7 +153,7 @@ pygame.font.init()
 screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Logic Game")
 clock = pygame.time.Clock()
-font = pygame.font.SysFont("Arial", 30)
+font = pygame.font.SysFont("Arial", 25)
 
 def step():
     global connections
@@ -179,6 +180,19 @@ def step():
             for c in node.connections:
                 if c in connections:
                     newConnections[connections.index(c)].powered = n1 and n2
+        elif node.type == "NAND":
+            n1 = False
+            n2 = False
+            for c in node.inputConnections:
+                if c.node2Socket == 0:
+                    if c.powered:
+                        n1 = True
+                if c.node2Socket == 1:
+                    if c.powered:
+                        n2 = True
+            for c in node.connections:
+                if c in connections:
+                    newConnections[connections.index(c)].powered = not n1 and n2
         elif node.type == "OR":
             n1 = False
             n2 = False
